@@ -4,9 +4,8 @@ from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
 from ament_index_python import get_package_share_path
 
-rviz_config_path = get_package_share_path('livox_ros_driver2') / 'config' / 'display_point_cloud_ROS2.rviz'
+rviz_config_path = str(get_package_share_path('livox_ros_driver2') / 'config' / 'display_point_cloud_ROS2.rviz')
 lidar_config_path = get_package_share_path('livox_ros_driver2') / 'config' / 'final_config.json'
-
 
 def generate_launch_description():
     declare_args = [ 
@@ -18,7 +17,7 @@ def generate_launch_description():
         DeclareLaunchArgument('frame_id', default_value='livox_frame', description='Frame ID'),
         DeclareLaunchArgument('lvx_file_path', default_value='/home/livox/livox_test.lvx', description='Path to LVX file'),
         DeclareLaunchArgument('cmdline_bd_code', default_value='livox0000000001', description='Command line board code'),
-        DeclareLaunchArgument('user_config_path', default_value='lidar_config_path', description='Path to the user config file')
+        DeclareLaunchArgument('user_config_path', default_value=str(lidar_config_path), description='Path to the user config file')
     ]
     
     xfer_format = LaunchConfiguration('xfer_format')
@@ -31,7 +30,6 @@ def generate_launch_description():
     user_config_path= LaunchConfiguration('user_config_path')
     cmdline_bd_code= LaunchConfiguration('cmdline_bd_code')
     
-
     livox_driver = Node(
         package='livox_ros_driver2',
         executable='livox_ros_driver2_node',
@@ -45,20 +43,19 @@ def generate_launch_description():
             "output_data_type": output_type,
             "frame_id": frame_id,
             "lvx_file_path": lvx_file_path,
-            "user_config_path": str(user_config_path),
-            "cmdline_input_bd_code": str(cmdline_bd_code)
+            "user_config_path": user_config_path,
+            "cmdline_input_bd_code": cmdline_bd_code
         }]
         )
     
-    livox_rviz = Node(
-            package='rviz2',
-            executable='rviz2',
-            output='screen',
-            arguments=['--display-config', rviz_config_path]
-        )
+    # livox_rviz = Node(
+    #         package='rviz2',
+    #         executable='rviz2',
+    #         output='screen',
+    #         arguments=['--display-config', rviz_config_path]
+    #     )
     
     ld = LaunchDescription(declare_args)
     ld.add_action(livox_driver)
-    ld.add_action(livox_rviz)
-
+    # ld.add_action(livox_rviz)
     return ld
