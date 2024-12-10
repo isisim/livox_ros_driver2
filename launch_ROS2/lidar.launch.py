@@ -45,7 +45,14 @@ def generate_launch_description():
             "lvx_file_path": lvx_file_path,
             "user_config_path": user_config_path,
             "cmdline_input_bd_code": cmdline_bd_code
-        }]
+        }],
+        remappings=[
+                # topics
+                ('/livox/lidar_192_168_1_161', '/front_lidar'),
+                ('/livox/lidar_192_168_1_3', '/rear_lidar'),
+                # ('/livox/imu_192_168_1_161', '/front_lidar'),
+                # ('/livox/imu_192_168_1_3', '/back_lidar'),
+            ]
         )
     
     # livox_rviz = Node(
