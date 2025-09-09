@@ -573,13 +573,13 @@ PublisherPtr Lddc::GetCurrentPublisher(uint8_t index) {
     char name_str[48];
     memset(name_str, 0, sizeof(name_str));
     if (use_multi_topic_) {
-      std::string ip_string = IpNumToString(lds_->lidars_[index].handle);
-      snprintf(name_str, sizeof(name_str), "livox/lidar_%s",
-               ReplacePeriodByUnderline(ip_string).c_str());
+      std::string ldName = lds_->lidars_[index].livox_config.ldName; 
+      snprintf(name_str, sizeof(name_str), "livox/lidar/%s/points",
+               ReplacePeriodByUnderline(ldName).c_str()); 
       DRIVER_INFO(*cur_node_, "Support multi topics.");
     } else {
       DRIVER_INFO(*cur_node_, "Support only one topic.");
-      snprintf(name_str, sizeof(name_str), "livox/lidar");
+      snprintf(name_str, sizeof(name_str), "livox/lidar/points");
     }
 
     *pub = new ros::Publisher;
@@ -624,12 +624,12 @@ PublisherPtr Lddc::GetCurrentImuPublisher(uint8_t handle) {
     memset(name_str, 0, sizeof(name_str));
     if (use_multi_topic_) {
       DRIVER_INFO(*cur_node_, "Support multi topics.");
-      std::string ip_string = IpNumToString(lds_->lidars_[handle].handle);
-      snprintf(name_str, sizeof(name_str), "livox/imu_%s",
-               ReplacePeriodByUnderline(ip_string).c_str());
+      std::string ldName = lds_->lidars_[handle].livox_config.ldName; 
+      snprintf(name_str, sizeof(name_str), "livox/lidar/%s/imu",
+               ReplacePeriodByUnderline(ldName).c_str());
     } else {
       DRIVER_INFO(*cur_node_, "Support only one topic.");
-      snprintf(name_str, sizeof(name_str), "livox/imu");
+      snprintf(name_str, sizeof(name_str), "livox/lidar/imu");
     }
 
     *pub = new ros::Publisher;
@@ -648,9 +648,9 @@ std::shared_ptr<rclcpp::PublisherBase> Lddc::GetCurrentPublisher(uint8_t handle)
       char name_str[48];
       memset(name_str, 0, sizeof(name_str));
 
-      std::string ip_string = IpNumToString(lds_->lidars_[handle].handle);
-      snprintf(name_str, sizeof(name_str), "livox/lidar_%s",
-          ReplacePeriodByUnderline(ip_string).c_str());
+      std::string ld_name = lds_->lidars_[handle].livox_config.ld_name;
+      snprintf(name_str, sizeof(name_str), "livox/%s/points",
+          ReplacePeriodByUnderline(ld_name).c_str());
       std::string topic_name(name_str);
       queue_size = queue_size * 2; // queue size is 64 for only one lidar
       private_pub_[handle] = CreatePublisher(transfer_format_, topic_name, queue_size);
@@ -658,7 +658,7 @@ std::shared_ptr<rclcpp::PublisherBase> Lddc::GetCurrentPublisher(uint8_t handle)
     return private_pub_[handle];
   } else {
     if (!global_pub_) {
-      std::string topic_name("livox/lidar");
+      std::string topic_name("livox/points");
       queue_size = queue_size * 8; // shared queue size is 256, for all lidars
       global_pub_ = CreatePublisher(transfer_format_, topic_name, queue_size);
     }
@@ -672,9 +672,9 @@ std::shared_ptr<rclcpp::PublisherBase> Lddc::GetCurrentImuPublisher(uint8_t hand
     if (!private_imu_pub_[handle]) {
       char name_str[48];
       memset(name_str, 0, sizeof(name_str));
-      std::string ip_string = IpNumToString(lds_->lidars_[handle].handle);
-      snprintf(name_str, sizeof(name_str), "livox/imu_%s",
-          ReplacePeriodByUnderline(ip_string).c_str());
+      std::string ld_name = lds_->lidars_[handle].livox_config.ld_name;
+      snprintf(name_str, sizeof(name_str), "livox/%s/imu",
+          ReplacePeriodByUnderline(ld_name).c_str());
       std::string topic_name(name_str);
       queue_size = queue_size * 2; // queue size is 64 for only one lidar
       private_imu_pub_[handle] = CreatePublisher(kLivoxImuMsg, topic_name,
